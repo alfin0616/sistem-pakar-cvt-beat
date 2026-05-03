@@ -17,9 +17,9 @@ function App() {
 
   // Fungsi sederhana untuk handle login
   const handleLogin = (role) => {
-    setIsLoggedIn(role); // role yang dikirim dari Login.jsx
-    setUserRole(role);
-    setIsLoggedIn(true);
+  setUserRole(role);
+  setIsLoggedIn(true);
+};
   };
   // Fungsi Logout (Tambahkan ini agar tidak error)
   const handleLogout = () => {
@@ -62,6 +62,5 @@ function App() {
       </Routes>
     </Router>
   );
-}
 
 export default App;
