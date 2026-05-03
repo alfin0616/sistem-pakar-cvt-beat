@@ -1,5 +1,5 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Gejala from "./pages/Gejala";
@@ -17,17 +17,17 @@ function App() {
 
   // Fungsi sederhana untuk handle login
   const handleLogin = (role) => {
-  setUserRole(role);
-  setIsLoggedIn(true);
-};
+    setUserRole(role);
+    setIsLoggedIn(true);
   };
-  // Fungsi Logout (Tambahkan ini agar tidak error)
+
+  // Fungsi Logout
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserRole(null);
   };
 
- return (
+  return (
     <Router>
       <Routes>
         <Route path="/register" element={<Register />} />
@@ -37,7 +37,6 @@ function App() {
         />
         <Route path="/*" element={
           isLoggedIn ? (
-            /* Cukup satu Layout saja yang membungkus Routes */
             <Layout role={userRole} onLogout={handleLogout}>
               <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -51,7 +50,6 @@ function App() {
                     <Route path="/rule" element={<Rule />} />
                   </>
                 )}
-                {/* Redirect jika path tidak ditemukan */}
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </Routes>
             </Layout>
@@ -62,5 +60,6 @@ function App() {
       </Routes>
     </Router>
   );
+} // Penutup fungsi App yang benar
 
 export default App;
