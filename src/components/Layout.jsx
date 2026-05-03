@@ -17,10 +17,11 @@ const Layout = ({ children, onLogout, role }) => {
       </button>
 
       {/* Sidebar */}
+     {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-[#1e293b] text-white p-5 transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-        md:relative md:translate-x-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-[#1e293b] text-white p-5 transform transition-all duration-300 ease-in-out
+        ${isOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 pointer-events-none"} 
+        md:relative md:translate-x-0 md:opacity-100 md:pointer-events-auto
       `}>
         <h2 className="text-xl font-bold text-orange-500 mb-10 text-center">SP CVT BEAT</h2>
         
