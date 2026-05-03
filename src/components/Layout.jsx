@@ -1,54 +1,48 @@
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react'; // Library ikon (opsional)
 
-const Layout = ({ children, role, onLogout }) => {
-  const navigate = useNavigate();
-
-  const handleLogoutAction = () => {
-    onLogout(); // Menghapus status login di App.jsx
-    navigate('/login');
-  };
+const DashboardLayout = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-800 text-white flex flex-col">
-        <div className="p-6 text-xl font-bold border-b border-slate-700 text-orange-500">
-          SP CVT BEAT
-        </div>
-        
-        <nav className="flex-1 p-4 space-y-2">
-          <Link to="/dashboard" className="block p-3 hover:bg-slate-700 rounded-lg">Dashboard</Link>
-          <Link to="/diagnosa" className="block p-3 hover:bg-slate-700 rounded-lg">Mulai Diagnosa</Link>
-          
-          {/* Menu Khusus Admin */}
-          {role === 'admin' && (
-            <>
-              <div className="pt-4 pb-2 text-xs font-bold text-slate-500 uppercase">Data Master</div>
-              <Link to="/gejala" className="block p-3 hover:bg-slate-700 rounded-lg">Data Gejala</Link>
-              <Link to="/kerusakan" className="block p-3 hover:bg-slate-700 rounded-lg">Data Kerusakan</Link>
-              <Link to="/rule" className="block p-3 hover:bg-slate-700 rounded-lg">Basis Aturan</Link>
-            </>
-          )}
+      {/* Tombol Hamburger untuk HP */}
+      <button 
+        className="fixed top-4 left-4 z-[60] md:hidden p-2 bg-orange-500 text-white rounded-md"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
 
-          <div className="pt-4 pb-2 text-xs font-bold text-slate-500 uppercase">User</div>
-          <Link to="/riwayat" className="block p-3 hover:bg-slate-700 rounded-lg">Riwayat</Link>
-          
-          <button 
-            onClick={handleLogoutAction}
-            className="w-full text-left p-3 mt-10 text-red-400 hover:bg-red-900/20 rounded-lg font-bold"
-          >
-            Logout
-          </button>
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-[#1e293b] text-white p-5 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+        md:relative md:translate-x-0
+      `}>
+        <h2 className="text-xl font-bold text-orange-500 mb-10">SP CVT BEAT</h2>
+        <nav className="space-y-4">
+          <a href="#" className="block hover:text-orange-400">Dashboard</a>
+          <a href="#" className="block hover:text-orange-400">Mulai Diagnosa</a>
+          <div className="pt-4 text-gray-500 text-sm">USER</div>
+          <a href="#" className="block hover:text-orange-400">Riwayat</a>
+          <a href="#" className="block text-red-400">Logout</a>
         </nav>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 p-10 overflow-y-auto">
+      {/* Overlay: Klik di luar menu untuk menutup di HP */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
+
+      {/* Konten Utama */}
+      <div className="flex-1 p-8">
         {children}
       </div>
     </div>
   );
 };
-
 export default Layout;
