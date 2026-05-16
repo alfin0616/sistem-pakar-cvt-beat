@@ -10,7 +10,7 @@ const Diagnosa = () => {
   const [loading, setLoading] = useState(true);
 
   // KUNCI UTAMA: Ubah ke IP Jaringan Laptop agar HP bisa mendeteksi API Django
-  const BASE_URL = 'http://10.183.150.227:8000'; 
+  const BASE_URL = 'https://mandarin-animation-buffing.ngrok-free.dev'; 
 
   useEffect(() => {
     const fetchData = async () => {
