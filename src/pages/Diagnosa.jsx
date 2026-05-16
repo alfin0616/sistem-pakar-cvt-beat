@@ -9,7 +9,6 @@ const Diagnosa = () => {
   const [hasil, setHasil] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // KUNCI UTAMA: Ubah ke IP Jaringan Laptop agar HP bisa mendeteksi API Django
   const BASE_URL = 'https://mandarin-animation-buffing.ngrok-free.dev'; 
 
   useEffect(() => {
@@ -56,7 +55,9 @@ const Diagnosa = () => {
     const userGejalaSorted = [...selectedGejala].sort((a, b) => a - b);
     let hasilTemuan = null;
 
-    // ALGORITMA FORWARD CHAINING (SUBSET MATCHING)
+    // =========================================================
+    // ALGORITMA FORWARD CHAINING (EXACT MATCHING OPTIMIZED)
+    // =========================================================
     for (const rule of daftarRules) {
       // Mengambil data dari gejala_detail karena field 'gejala' murni write-only pada serializer
       const ruleGejalaIds = rule.gejala_detail 
@@ -65,16 +66,20 @@ const Diagnosa = () => {
 
       if (ruleGejalaIds.length === 0) continue;
 
-      // Cek apakah seluruh kriteria gejala pada rule ini dipenuhi oleh pilihan user
-      const isMatch = ruleGejalaIds.every(id => userGejalaSorted.includes(id));
+      // 1. Cek apakah jumlah gejala yang dipilih user SAMA PERSIS dengan jumlah kriteria di Rule
+      const isLengthMatch = ruleGejalaIds.length === userGejalaSorted.length;
 
-      if (isMatch) {
+      // 2. Cek apakah seluruh itemnya berpasangan dengan benar
+      const isContentMatch = ruleGejalaIds.every(id => userGejalaSorted.includes(id));
+
+      // Aturan dinyatakan sah jika memenuhi kedua kondisi di atas (Mutlak/Presisi)
+      if (isLengthMatch && isContentMatch) {
         hasilTemuan = {
           nama_kerusakan: rule.kerusakan_detail?.nama_kerusakan || "Kerusakan Terdeteksi",
           solusi: rule.kerusakan_detail?.solusi || "Hubungi mekanik untuk pengecekan lebih lanjut.",
           gejala_text: daftarGejala.filter(g => selectedGejala.includes(g.id)).map(g => g.nama_gejala).join(', ')
         };
-        break; 
+        break; // Hentikan pencarian jika sudah ketemu yang pas mutlak
       }
     }
 
@@ -88,7 +93,7 @@ const Diagnosa = () => {
 
     setHasil(hasilTemuan);
 
-    // MENGIRIM RIWAYAT KE BACKEND (Sudah menggunakan BASE_URL dinamis)
+    // MENGIRIM RIWAYAT KE BACKEND 
     try {
       const payload = {
         gejala_dipilih: hasilTemuan.gejala_text,
