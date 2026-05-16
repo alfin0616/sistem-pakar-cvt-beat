@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Tambahkan useEffect
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Gejala from "./pages/Gejala";
@@ -11,21 +11,43 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 function App() {
-  // State untuk mengecek apakah admin sudah login atau belum
+  // Ambil data awal dari localStorage jika ada
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [isChecking, setIsChecking] = useState(true); // State untuk loading pengecekan
 
-  // Fungsi sederhana untuk handle login
+  // ==========================================
+  // FITUR ANTI-REFRESH: Cek session saat dimuat
+  // ==========================================
+  useEffect(() => {
+    const statusLogin = localStorage.getItem('isLoggedIn');
+    const savedRole = localStorage.getItem('userRole');
+
+    if (statusLogin === 'true' && savedRole) {
+      setIsLoggedIn(true);
+      setUserRole(savedRole);
+    }
+    setIsChecking(false); // Selesai mengecek
+  }, []);
+
   const handleLogin = (role) => {
     setUserRole(role);
     setIsLoggedIn(true);
+    // Simpan ke storage saat login berhasil
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userRole', role);
   };
 
-  // Fungsi Logout
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserRole(null);
+    // Hapus storage saat logout
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
   };
+
+  // Jangan render apa pun sebelum selesai mengecek storage
+  if (isChecking) return null;
 
   return (
     <Router>
@@ -39,6 +61,7 @@ function App() {
           isLoggedIn ? (
             <Layout role={userRole} onLogout={handleLogout}>
               <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/diagnosa" element={<Diagnosa />} />
                 <Route path="/riwayat" element={<Riwayat />} />
@@ -60,6 +83,6 @@ function App() {
       </Routes>
     </Router>
   );
-} // Penutup fungsi App yang benar
+}
 
 export default App;

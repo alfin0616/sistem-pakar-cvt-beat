@@ -22,7 +22,7 @@ const Dashboard = () => {
         </div>
         <div className="hidden md:block">
           <img 
-            src="gambar_honda_beat.png" 
+            src="src/assets/gambar_honda_beat.png" 
             alt="Honda Beat" 
             className="h-32 object-contain"
           />
