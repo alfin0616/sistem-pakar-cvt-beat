@@ -9,7 +9,7 @@ const Diagnosa = () => {
   const [hasil, setHasil] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = 'https://mandarin-animation-buffing.ngrok-free.dev'; 
+  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'; 
 
   useEffect(() => {
     const fetchData = async () => {
