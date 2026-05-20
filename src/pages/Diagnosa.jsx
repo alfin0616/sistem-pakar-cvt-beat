@@ -2,20 +2,28 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const Diagnosa = () => {
   const [daftarGejala, setDaftarGejala] = useState([]);
   const [daftarRules, setDaftarRules] = useState([]);
   const [selectedGejala, setSelectedGejala] = useState([]);
   const [hasil, setHasil] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'; 
-
-  useEffect(() => {
+ 
+ useEffect(() => {
     const fetchData = async () => {
       try {
-        const resGejala = await axios.get(`${BASE_URL}/api/gejala/`);
-        const resRules = await axios.get(`${BASE_URL}/api/rules/`);
+        // Konfigurasi header untuk melewati halaman peringatan Ngrok
+        const config = {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'
+          }
+        };
+
+        // Memasukkan config ke setiap request GET
+        const resGejala = await axios.get(`${BASE_URL}/api/gejala/`, config);
+        const resRules = await axios.get(`${BASE_URL}/api/rules/`, config);
         
         const sortedGejala = resGejala.data.sort((a, b) => 
           a.kode_gejala.localeCompare(b.kode_gejala, undefined, { numeric: true })
@@ -59,27 +67,22 @@ const Diagnosa = () => {
     // ALGORITMA FORWARD CHAINING (EXACT MATCHING OPTIMIZED)
     // =========================================================
     for (const rule of daftarRules) {
-      // Mengambil data dari gejala_detail karena field 'gejala' murni write-only pada serializer
       const ruleGejalaIds = rule.gejala_detail 
         ? rule.gejala_detail.map(g => g.id).sort((a, b) => a - b)
         : [];
 
       if (ruleGejalaIds.length === 0) continue;
 
-      // 1. Cek apakah jumlah gejala yang dipilih user SAMA PERSIS dengan jumlah kriteria di Rule
       const isLengthMatch = ruleGejalaIds.length === userGejalaSorted.length;
-
-      // 2. Cek apakah seluruh itemnya berpasangan dengan benar
       const isContentMatch = ruleGejalaIds.every(id => userGejalaSorted.includes(id));
 
-      // Aturan dinyatakan sah jika memenuhi kedua kondisi di atas (Mutlak/Presisi)
       if (isLengthMatch && isContentMatch) {
         hasilTemuan = {
           nama_kerusakan: rule.kerusakan_detail?.nama_kerusakan || "Kerusakan Terdeteksi",
           solusi: rule.kerusakan_detail?.solusi || "Hubungi mekanik untuk pengecekan lebih lanjut.",
           gejala_text: daftarGejala.filter(g => selectedGejala.includes(g.id)).map(g => g.nama_gejala).join(', ')
         };
-        break; // Hentikan pencarian jika sudah ketemu yang pas mutlak
+        break; 
       }
     }
 
@@ -100,7 +103,14 @@ const Diagnosa = () => {
         nama_kerusakan: hasilTemuan.nama_kerusakan,
         solusi: hasilTemuan.solusi
       };
-      await axios.post(`${BASE_URL}/api/riwayat/`, payload);
+      
+      // Tambahkan juga header bypass di request POST riwayat ini
+      await axios.post(`${BASE_URL}/api/riwayat/`, payload, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+      
       console.log("Berhasil simpan otomatis riwayat!");
     } catch (error) {
       console.error("Gagal simpan ke database riwayat:", error.response?.data);
